@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { FileIcon } from 'lucide-react';
 import { pdfToText } from 'pdf-ts';
 import { useUser } from "@clerk/nextjs";
 
@@ -63,7 +62,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://127.0.0.1:5001/set_api_key', {
+            const response = await fetch('http://64.227.138.80:5000/set_api_key', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,7 +99,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://127.0.0.1:5001/set_model', {
+            const response = await fetch('http://64.227.138.80:5000/set_model', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -158,7 +157,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                 }
 
                 // Send context to backend
-                const response = await fetch('http://127.0.0.1:5001/set_context', {
+                const response = await fetch('http://64.227.138.80:5000/set_context', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -269,6 +268,39 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                     </div>
                 );
 
+            // case 3:
+            //     return (
+            //         <div className="space-y-4">
+            //             <div className="space-y-2">
+            //                 <Label>Upload PDF</Label>
+            //                 <div className="flex items-center space-x-2">
+            //                     <Input
+            //                         type="file"
+            //                         accept=".pdf"
+            //                         onChange={handleFileUpload}
+            //                         disabled={isLoading}
+            //                         className="hidden"
+            //                         ref={fileInputRef}
+            //                     />
+            //                     {projectData.file && (
+            //                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            //                             <FileIcon className="h-4 w-4" />
+            //                             <span>{projectData.file.name}</span>
+            //                         </div>
+            //                     )}
+            //                 </div>
+            //             </div>
+
+            //             <Button
+            //                 onClick={handleFileButtonClick}
+            //                 className="w-full"
+            //                 disabled={isLoading || !projectData.file}
+            //             >
+            //                 {isLoading ? 'Processing...' : 'Upload File'}
+            //             </Button>
+            //         </div>
+            //     );
+
             case 3:
                 return (
                     <div className="space-y-4">
@@ -283,24 +315,33 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                                     className="hidden"
                                     ref={fileInputRef}
                                 />
-                                {projectData.file && (
-                                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                                        <FileIcon className="h-4 w-4" />
-                                        <span>{projectData.file.name}</span>
-                                    </div>
-                                )}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleFileButtonClick}
+                                    disabled={isLoading}
+                                    className="w-full"
+                                >
+                                    {projectData.file
+                                        ? `Selected: ${projectData.file.name}`
+                                        : "Choose PDF File"}
+                                </Button>
                             </div>
                         </div>
 
-                        <Button
-                            onClick={handleFileButtonClick}
-                            className="w-full"
-                            disabled={isLoading || !projectData.file}
-                        >
-                            {isLoading ? 'Processing...' : 'Upload File'}
-                        </Button>
+                        {projectData.file && (
+                            <Button
+                                type="button"
+                                onClick={handleFileButtonClick} // Change this line
+                                className="w-full"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Processing...' : 'Upload File'}
+                            </Button>
+                        )}
                     </div>
                 );
+
 
             default:
                 return null;
