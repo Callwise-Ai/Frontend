@@ -1,19 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import mongoose from 'mongoose';
 
-// Define the context type for route parameters
-type RouteContext = {
-    params: {
-        userId: string;
-    };
-};
-
 export async function GET(
-    request: NextRequest,
-    { params }: RouteContext
+    request: NextRequest, 
+    { params }: { params: Promise<{ userId: string }> } // Define params as a promise
 ) {
     try {
+        // Await the params to destructure the userId
+        const { userId } = await params;
+
         // Ensure database connection
         await connectDB();
 
@@ -22,35 +19,32 @@ export async function GET(
             throw new Error('Database connection failed');
         }
 
-        // Extract userId from context
-        const { userId } = params;
-
         // Ensure database connection is established
         const db = mongoose.connection.db;
         if (!db) {
             throw new Error('Database is not available');
         }
 
-        const usersCollection = db.collection('users');
+        const projectsCollection = db.collection('projects');
 
-        // Find user by user_id
-        const user = await usersCollection.findOne({
+        // Find projects by user_id
+        const projects = await projectsCollection.find({
             user_id: userId
-        });
+        }).toArray();
 
-        // Handle cases where user is not found
-        if (!user) {
+        // Handle cases where no projects are found
+        if (projects.length === 0) {
             return NextResponse.json(
                 { message: 'New user' },
                 { status: 202 }
             );
         }
 
-        // Return user data
-        return NextResponse.json(user);
+        // Return projects data
+        return NextResponse.json(projects);
     } catch (error) {
         // Handle any errors during fetch
-        console.error('Error fetching user:', error);
+        console.error('Error fetching projects:', error);
         return NextResponse.json(
             {
                 message: 'Internal server error',
