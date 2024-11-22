@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Github, Copy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+
 import {
   ClerkProvider,
   SignInButton,
@@ -17,13 +20,44 @@ export default function Home() {
   const router = useRouter();
   const { isSignedIn } = useUser();
   const [copied, setCopied] = useState(false);
-  const sampleCode = `function explodingBeams() {
-  return {
-    cool: true,
-    explosive: true,
-    awesome: 'maximum'
-  };
-}`;
+  const sampleCode = `import os
+import requests
+
+# Make sure to set your CALLWISE_API environment variable in your environment
+
+RAG_QUERY_URL = 'http://64.227.138.80:5000/rag_query'
+
+def send_transcript_to_rag_query(final_transcript):
+    try:
+        callwise_api = os.getenv('CALLWISE_API')
+       
+        if callwise_api is None:
+            print("Error: CALLWISE_API environment variable is not set.")
+            return None
+
+        payload = {
+            "user_id": callwise_api,
+            "query": final_transcript,
+            "conversation_history": []
+        }
+
+        response = requests.post(RAG_QUERY_URL, json=payload)
+
+        if response.status_code == 200:
+            output = response.json().get("response", "No response")
+            print("RAG Response:", output)
+            return output
+        else:
+            print("Error:", response.json())
+            return None
+    except Exception as e:
+        print(f"Error sending to RAG query: {e}")
+        return None
+
+if __name__ == "__main__":
+    final_transcript = "What is the weather like today?"
+    rag_output = send_transcript_to_rag_query(final_transcript)
+    print("Output from RAG Query:", rag_output)`;
 
   // Redirect to dashboard if signed in
   useEffect(() => {
@@ -83,13 +117,13 @@ export default function Home() {
             <div className="w-1/2 space-y-8">
               <div className="animate-fade-in-left">
                 <h1 className="text-5xl font-bold text-white mb-4">
-                  Creativity <br />Meets <br />
+                Build Smarter  <br />with Custom <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-violet-500 to-pink-500">
-                    Innovation
+                  AI APIs
                   </span>
                 </h1>
                 <p className="text-xl text-gray-300 italic">
-                  "The future belongs to those who believe in the beauty of their dreams."
+                Create context-aware LLMs powered by your data. Generate your API in minutes and integrate seamlessly into any application
                 </p>
               </div>
 
@@ -106,24 +140,44 @@ export default function Home() {
             </div>
 
             {/* Right Side - Code Box */}
+            {/* Right Side - Code Box */}
             <div className="w-1/2 relative">
-              <div className="bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700">
-                <div className="bg-gray-700 p-2 flex justify-between items-center">
-                  <span className="text-white text-sm">Exploding Beams</span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white hover:bg-gray-600"
-                    onClick={handleCopy}
-                  >
-                    {copied ? 'Copied!' : <Copy className="w-4 h-4" />}
-                  </Button>
-                </div>
-                <pre className="p-4 text-sm text-green-400 overflow-x-auto">
-                  <code>{sampleCode}</code>
-                </pre>
-              </div>
-            </div>
+  <div className="bg-gray-900 rounded-lg shadow-2xl border border-gray-700 w-[600px] h-[600px] overflow-hidden">
+    <div className="bg-gray-800 p-2 flex justify-between items-center">
+      <span className="text-white text-sm">test.py</span>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-white hover:bg-gray-600"
+        onClick={handleCopy}
+      >
+        {copied ? 'Copied!' : <Copy className="w-4 h-4" />}
+      </Button>
+    </div>
+    <div className="h-[550px] overflow-y-auto">
+      <SyntaxHighlighter
+        language="python"
+        style={vscDarkPlus}
+        customStyle={{
+          margin: 0,
+          padding: '16px',
+          borderRadius: 0,
+          background: 'transparent',
+          height: 'auto',
+          overflowY: 'visible'
+        }}
+        codeTagProps={{
+          style: {
+            fontFamily: 'Fira Code, monospace',
+            fontSize: '0.85rem'
+          }
+        }}
+      >
+        {sampleCode}
+      </SyntaxHighlighter>
+    </div>
+  </div>
+</div>
           </div>
         </div>
       </div>
