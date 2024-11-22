@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { PlusIcon, FileIcon } from 'lucide-react';
+import { FileIcon } from 'lucide-react';
 import { pdfToText } from 'pdf-ts';
 import { useUser } from "@clerk/nextjs";
 
@@ -39,9 +39,10 @@ interface ProjectData {
     fileContent: string;
 }
 
-export function CreateNewProjectModal() {
+export function CreateNewProjectModal({ isNewUser = false }) {
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(isNewUser);
     const [projectData, setProjectData] = useState<ProjectData>({
         apiKey: '',
         model: '',
@@ -181,7 +182,8 @@ export function CreateNewProjectModal() {
                         description: `Extracted ${parsedText.split(' ').length} words`
                     });
 
-                    // Optionally add further logic for project completion
+                    // Close modal and mark project creation complete
+                    setIsModalOpen(false);
                 } else {
                     throw new Error(result.error || 'Failed to set context');
                 }
@@ -306,18 +308,24 @@ export function CreateNewProjectModal() {
     };
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button className='p-4 border border-white '>
-                    <PlusIcon className="mr-2 h-4 w-4 " />
-                    Create New Project
-                </Button>
-            </DialogTrigger>
+        <Dialog
+            open={isModalOpen}
+            onOpenChange={isNewUser ? undefined : setIsModalOpen}
+        >
+            {!isNewUser && (
+                <DialogTrigger asChild>
+                    <Button className='p-4 border border-white'>
+                        Create New Project
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Create New Project</DialogTitle>
                     <DialogDescription>
-                        Fill in the details to create a new project.
+                        {isNewUser
+                            ? "Welcome! Please complete your project setup."
+                            : "Fill in the details to create a new project."}
                     </DialogDescription>
                 </DialogHeader>
                 {renderStepContent()}
