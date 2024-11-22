@@ -88,7 +88,7 @@ if __name__ == "__main__":
               <Button
                 variant="outline"
                 className="bg-white/10 text-white hover:bg-white/20 flex items-center gap-2"
-                onClick={() => window.open('https://github.com', '_blank')}
+                onClick={() => window.open('https://github.com/Architgarg2003/Echo', '_blank')}
               >
                 <Github className="w-5 h-5" />
                 GitHub

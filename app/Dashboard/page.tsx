@@ -344,6 +344,7 @@ import { Button } from "@/components/ui/button";
 import { CreateNewProjectModal } from "@/components/CreateNewProjectModal";
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 type Project = {
     _id: string;
     // Add other properties that exist in your project object
@@ -359,10 +360,13 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [isNewUser, setIsNewUser] = useState(false);
 
+    const router = useRouter()
+
     useEffect(() => {
         async function fetchProjects() {
             // Only fetch if user is authenticated
             if (!user) {
+                router.push('/')
                 setLoading(false);
                 return;
             }
