@@ -19,9 +19,9 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
     return (
-        <Card>
+        <Card className="bg-gray-800"> {/* Dark background for project card */}
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-lg">{project.name}</CardTitle>
+                <CardTitle className="text-white">{project.name}</CardTitle> {/* White text for project name */}
                 <Badge
                     variant={project.status === 'Active' ? 'default' : 'secondary'}
                 >
@@ -29,12 +29,12 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 </Badge>
             </CardHeader>
             <CardContent>
-                <CardDescription>
+                <CardDescription className="text-gray-400"> {/* Lighter text for description */}
                     Model: {project.model}
                 </CardDescription>
                 <div className="mt-4 flex justify-end">
                     <Link href={`/project/${project.id}`}>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" className="text-black border-gray-600"> {/* White text and border for button */}
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                         </Button>

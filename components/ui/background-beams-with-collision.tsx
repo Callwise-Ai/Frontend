@@ -19,41 +19,41 @@ export const BackgroundBeamsWithCollision = ({
       translateX: 10,
       duration: 7,
       repeatDelay: 3,
-      delay: 2,
+      delay: 1,
     },
     {
       initialX: 600,
       translateX: 600,
       duration: 3,
       repeatDelay: 3,
-      delay: 4,
+      delay: 2,
     },
     {
       initialX: 100,
       translateX: 100,
       duration: 7,
-      repeatDelay: 7,
+      repeatDelay: 4,
       className: "h-6",
     },
     {
       initialX: 400,
       translateX: 400,
       duration: 5,
-      repeatDelay: 14,
+      repeatDelay: 10,
       delay: 4,
     },
     {
       initialX: 800,
       translateX: 800,
       duration: 11,
-      repeatDelay: 2,
+      repeatDelay: 1,
       className: "h-20",
     },
     {
       initialX: 1000,
       translateX: 1000,
       duration: 4,
-      repeatDelay: 2,
+      repeatDelay: 1,
       className: "h-12",
     },
     {
@@ -70,10 +70,17 @@ export const BackgroundBeamsWithCollision = ({
     <div
       ref={parentRef}
       className={cn(
-        "h-96 md:h-[40rem] bg-gradient-to-b from-white to-neutral-100 dark:from-neutral-950 dark:to-neutral-800 relative flex items-center w-full justify-center overflow-hidden",
-        // h-screen if you want bigger
+        "w-full min-w-[100vw] h-screen bg-neutral-950 dark:bg-neutral-950 relative flex items-center justify-center overflow-hidden",
+        "backdrop-blur-sm bg-opacity-50",
         className
       )}
+      style={{
+        background: `
+                    linear-gradient(to bottom, #0B0B0B, #242424),
+                    radial-gradient(circle at 20% 30%, rgba(29, 24, 54, 0.3) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(29, 24, 54, 0.3) 0%, transparent 50%)
+                `,
+      }}
     >
       {beams.map((beam) => (
         <CollisionMechanism
@@ -87,7 +94,7 @@ export const BackgroundBeamsWithCollision = ({
       {children}
       <div
         ref={containerRef}
-        className="absolute bottom-0 bg-neutral-100 w-full inset-x-0 pointer-events-none"
+        className="absolute bottom-0 bg-neutral-900/30 w-full inset-x-0 pointer-events-none"
         style={{
           boxShadow:
             "0 0 24px rgba(34, 42, 53, 0.06), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.04), 0 0 4px rgba(34, 42, 53, 0.08), 0 16px 68px rgba(47, 48, 55, 0.05), 0 1px 0 rgba(255, 255, 255, 0.1) inset",
@@ -96,6 +103,7 @@ export const BackgroundBeamsWithCollision = ({
     </div>
   );
 };
+
 
 const CollisionMechanism = React.forwardRef<
   HTMLDivElement,

@@ -30,10 +30,10 @@ export default function DashboardPage() {
     return (
         <div className="flex">
             {/* Sidebar is fixed, so we need to add margin to the main content */}
-            <div className="flex-grow p-6 ml-64"> {/* Assuming sidebar width is 16rem (64) */}
+            <div className="flex-grow p-6 ml-64 bg-gray-900"> {/* Dark background for main content */}
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                        <h1 className="text-2xl font-bold">My Projects</h1>
+                        <h1 className="text-2xl font-bold text-white">My Projects</h1> {/* White text for dark mode */}
                         {/* Create New Project Button/Modal */}
                         <CreateNewProjectModal />
                     </div>
@@ -47,12 +47,12 @@ export default function DashboardPage() {
                         ))}
 
                         {projects.length === 0 && (
-                            <Card className="col-span-full">
+                            <Card className="col-span-full bg-gray-800"> {/* Dark background for empty state */}
                                 <CardHeader>
-                                    <CardTitle>No Projects Yet</CardTitle>
+                                    <CardTitle className="text-white">No Projects Yet</CardTitle> {/* White text */}
                                 </CardHeader>
                                 <CardContent>
-                                    <p>Create your first project to get started!</p>
+                                    <p className="text-gray-400">Create your first project to get started!</p> {/* Lighter text for contrast */}
                                 </CardContent>
                             </Card>
                         )}
