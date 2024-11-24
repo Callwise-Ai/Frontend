@@ -30,11 +30,11 @@ export default function Sidebar() {
                     icon={<LayoutDashboard className="h-5 w-5 text-white" />}
                     label="Dashboard"
                 />
-                <SidebarItem
+                {/* <SidebarItem
                     href="/create-project"
                     icon={<PlusCircle className="h-5 w-5 text-white" />}
                     label="Create Project"
-                />
+                /> */}
                 <SidebarItem
                     href="/Dashboard/CallBot"
                     icon={<Phone className="h-5 w-5 text-white" />}

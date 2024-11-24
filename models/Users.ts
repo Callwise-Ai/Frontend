@@ -1,14 +1,23 @@
 import mongoose from 'mongoose';
 
+// Interface defining the user schema
 export interface IUser extends mongoose.Document {
     _id: mongoose.Types.ObjectId;
     user_id: string;
-    api_key: string;
-    available_models: string[];
-    selected_model: string;
-    context: string;
+    api_key: string; // This will be a random 24-character string
 }
 
+// Helper function to generate a random 24-character alphanumeric string
+const generateRandomString = (length: number): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+};
+
+// Mongoose schema for the User model
 const UserSchema = new mongoose.Schema<IUser>({
     user_id: {
         type: String,
@@ -17,23 +26,8 @@ const UserSchema = new mongoose.Schema<IUser>({
     },
     api_key: {
         type: String,
-        required: true
-    },
-    selected_model: {
-        type: String,
-        default: 'Meta-Llama-3.1-405B-Instruct'
-    },
-    available_models: {
-        type: [String],
-        default: [
-            "Meta-Llama-3.1-405B-Instruct",
-            "Meta-Llama-3.1-70B-Instruct",
-            "Meta-Llama-3.1-8B-Instruct",
-            "Meta-Llama-3.2-3B-Instruct"
-        ]
-    },
-    context: {
-        type: String
+        required: true,
+        default: () => generateRandomString(24)  // Generate a random 24-digit string for api_key
     }
 }, {
     timestamps: false

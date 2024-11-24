@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -49,11 +49,10 @@ export function CreateNewProjectModal({ isNewUser = false }) {
         fileContent: ''
     });
 
-    // Get user ID from Clerk
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { user } = useUser();
     const userId = user?.id;
 
-    // Validate and Set API Key
     const handleSetApiKey = async () => {
         if (!userId) {
             toast.error('User not authenticated');
@@ -62,7 +61,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://64.227.138.80:5000/set_api_key', {
+            const response = await fetch('//64.227.138.80:5000/set_api_key', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -76,7 +75,6 @@ export function CreateNewProjectModal({ isNewUser = false }) {
             const result = await response.json();
 
             if (response.ok) {
-                // If API key is set successfully, move to model selection
                 toast.success('API Key validated successfully');
                 setStep(2);
             } else {
@@ -90,7 +88,6 @@ export function CreateNewProjectModal({ isNewUser = false }) {
         }
     };
 
-    // Set Model
     const handleSetModel = async () => {
         if (!userId) {
             toast.error('User not authenticated');
@@ -99,7 +96,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://64.227.138.80:5000/set_model', {
+            const response = await fetch('//64.227.138.80:5000/set_model', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -113,7 +110,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
             const result = await response.json();
 
             if (response.ok) {
-                // Move to file upload step
+                toast.success('Model set successfully');
                 setStep(3);
             } else {
                 toast.error(result.error || 'Failed to set model');
@@ -126,85 +123,86 @@ export function CreateNewProjectModal({ isNewUser = false }) {
         }
     };
 
-    // File Upload Handler
-    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Strict PDF file validation
-            if (file.type !== 'application/pdf') {
-                toast.error('Invalid file type', {
-                    description: 'Please upload only PDF files'
-                });
-                return;
-            }
-
-            const maxSize = 50 * 1024 * 1024; // 50MB
-            if (file.size > maxSize) {
-                toast.error('File too large', {
-                    description: 'Maximum file size is 50MB'
-                });
-                return;
-            }
-
-            setIsLoading(true);
-            try {
-                const fileBuffer = await file.arrayBuffer();
-                const parsedText = await pdfToText(new Uint8Array(fileBuffer));
-
-                // Validate extracted content
-                if (!parsedText || parsedText.length < 10) {
-                    throw new Error('No meaningful content extracted');
-                }
-
-                // Send context to backend
-                const response = await fetch('http://64.227.138.80:5000/set_context', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        context: parsedText
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    setProjectData(prev => ({
-                        ...prev,
-                        file,
-                        fileContent: parsedText
-                    }));
-
-                    toast.success('PDF content extracted and sent successfully', {
-                        description: `Extracted ${parsedText.split(' ').length} words`
-                    });
-
-                    // Close modal and mark project creation complete
-                    setIsModalOpen(false);
-                } else {
-                    throw new Error(result.error || 'Failed to set context');
-                }
-            } catch (error) {
-                console.error("Error parsing PDF or setting context:", error);
-                toast.error('Error processing PDF', {
-                    description: error instanceof Error ? error.message : 'Unknown error'
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        }
-    };
-
-    // Function to trigger file input
     const handleFileButtonClick = () => {
         fileInputRef.current?.click();
     };
 
-    const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-    // Render Step Content
+        if (file.type !== 'application/pdf') {
+            toast.error('Invalid file type', {
+                description: 'Please upload only PDF files'
+            });
+            return;
+        }
+
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+            toast.error('File too large', {
+                description: 'Maximum file size is 50MB'
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const fileBuffer = await file.arrayBuffer();
+            const parsedText = await pdfToText(new Uint8Array(fileBuffer));
+
+            if (!parsedText || parsedText.length < 10) {
+                throw new Error('No meaningful content extracted');
+            }
+
+            // Update file state before making the API call
+            setProjectData(prev => ({
+                ...prev,
+                file,
+                fileContent: parsedText
+            }));
+
+            const contextResponse = await fetch('//64.227.138.80:5000/set_context', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    context: parsedText
+                })
+            });
+
+            if (!contextResponse.ok) {
+                throw new Error('Failed to set context');
+            }
+
+            const projectResponse = await fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id: userId })
+            });
+
+            const projectResult = await projectResponse.json();
+
+            if (projectResult.message === 'User created successfully') {
+                toast.success('Project created successfully');
+                setIsModalOpen(false);
+            } else {
+                throw new Error(projectResult.message || 'Failed to create project');
+            }
+        } catch (error) {
+            console.error("Error processing file:", error);
+            toast.error('Error processing PDF', {
+                description: error instanceof Error ? error.message : 'Unknown error'
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const renderStepContent = () => {
         switch (step) {
             case 1:
@@ -239,13 +237,14 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                         <div>
                             <Label>Select Model</Label>
                             <Select
-                                value={projectData.model}
-                                onValueChange={(value) => setProjectData(prev => ({
-                                    ...prev,
-                                    model: value
-                                }))}
+                                onValueChange={(value) => {
+                                    setProjectData(prev => ({
+                                        ...prev,
+                                        model: value
+                                    }));
+                                }}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Choose a model" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -257,7 +256,6 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                                 </SelectContent>
                             </Select>
                         </div>
-
                         <Button
                             onClick={handleSetModel}
                             className="w-full"
@@ -268,80 +266,33 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                     </div>
                 );
 
-            // case 3:
-            //     return (
-            //         <div className="space-y-4">
-            //             <div className="space-y-2">
-            //                 <Label>Upload PDF</Label>
-            //                 <div className="flex items-center space-x-2">
-            //                     <Input
-            //                         type="file"
-            //                         accept=".pdf"
-            //                         onChange={handleFileUpload}
-            //                         disabled={isLoading}
-            //                         className="hidden"
-            //                         ref={fileInputRef}
-            //                     />
-            //                     {projectData.file && (
-            //                         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            //                             <FileIcon className="h-4 w-4" />
-            //                             <span>{projectData.file.name}</span>
-            //                         </div>
-            //                     )}
-            //                 </div>
-            //             </div>
-
-            //             <Button
-            //                 onClick={handleFileButtonClick}
-            //                 className="w-full"
-            //                 disabled={isLoading || !projectData.file}
-            //             >
-            //                 {isLoading ? 'Processing...' : 'Upload File'}
-            //             </Button>
-            //         </div>
-            //     );
-
             case 3:
                 return (
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label>Upload PDF</Label>
-                            <div className="flex items-center space-x-2">
-                                <Input
-                                    type="file"
-                                    accept=".pdf"
-                                    onChange={handleFileUpload}
-                                    disabled={isLoading}
-                                    className="hidden"
-                                    ref={fileInputRef}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleFileButtonClick}
-                                    disabled={isLoading}
-                                    className="w-full"
-                                >
-                                    {projectData.file
-                                        ? `Selected: ${projectData.file.name}`
-                                        : "Choose PDF File"}
-                                </Button>
-                            </div>
-                        </div>
-
-                        {projectData.file && (
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                onChange={handleFileUpload}
+                                disabled={isLoading}
+                                className="hidden"
+                                ref={fileInputRef}
+                            />
                             <Button
                                 type="button"
-                                onClick={handleFileButtonClick} // Change this line
-                                className="w-full"
+                                variant="outline"
+                                onClick={handleFileButtonClick}
                                 disabled={isLoading}
+                                className="w-full"
                             >
-                                {isLoading ? 'Processing...' : 'Upload File'}
+                                {projectData.file
+                                    ? `Selected: ${projectData.file.name}`
+                                    : "Choose PDF File"}
                             </Button>
-                        )}
+                        </div>
                     </div>
                 );
-
 
             default:
                 return null;
@@ -355,7 +306,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
         >
             {!isNewUser && (
                 <DialogTrigger asChild>
-                    <Button className='p-4 border border-white'>
+                    <Button className="p-4 border border-white">
                         Create New Project
                     </Button>
                 </DialogTrigger>
