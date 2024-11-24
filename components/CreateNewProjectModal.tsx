@@ -53,9 +53,21 @@ export function CreateNewProjectModal({ isNewUser = false }) {
     const { user } = useUser();
     const userId = user?.id;
 
+    // Function to validate API key format (UUID)
+    const isValidApiKey = (key: string) => {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(key);
+    };
+
     const handleSetApiKey = async () => {
         if (!userId) {
             toast.error('User not authenticated');
+            return;
+        }
+
+        // Validate API key format
+        if (!isValidApiKey(projectData.apiKey)) {
+            toast.error('Invalid API Key format. Please enter a valid UUID.');
             return;
         }
 
@@ -177,22 +189,22 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                 throw new Error('Failed to set context');
             }
 
-            const projectResponse = await fetch('/api/projects', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ user_id: userId })
-            });
+            // const projectResponse = await fetch('/api/projects', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     },
+            //     body: JSON.stringify({ user_id: userId })
+            // });
 
-            const projectResult = await projectResponse.json();
+            // const projectResult = await projectResponse.json();
 
-            if (projectResult.message === 'User created successfully') {
-                toast.success('Project created successfully');
-                setIsModalOpen(false);
-            } else {
-                throw new Error(projectResult.message || 'Failed to create project');
-            }
+            // if (projectResult.message === 'User created successfully') {
+            //     toast.success('Project created successfully');
+            //     setIsModalOpen(false);
+            // } else {
+            //     throw new Error(projectResult.message || 'Failed to create project');
+            // }
         } catch (error) {
             console.error("Error processing file:", error);
             toast.error('Error processing PDF', {
@@ -218,7 +230,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                                     ...prev,
                                     apiKey: e.target.value
                                 }))}
-                                placeholder="Enter your API key"
+                                placeholder="Enter your Sambanova API key"
                             />
                         </div>
                         <Button
@@ -247,7 +259,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Choose a model" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className='bg-white'>
                                     {AVAILABLE_MODELS.map((model) => (
                                         <SelectItem key={model} value={model}>
                                             {model}

@@ -1,6 +1,6 @@
 
 
-// "use client"
+// "use client";
 
 // import { useState, useEffect } from 'react';
 // import { useUser } from '@clerk/nextjs';
@@ -111,7 +111,7 @@
 //     }
 
 //     return (
-//         <div className="flex">
+//         <div className="flex flex-col min-h-screen">
 //             <div className="flex-grow p-6 ml-64 bg-gray-900 space-y-6">
 //                 {isNewUser ? (
 //                     <CreateNewProjectModal isNewUser={true} />
@@ -119,7 +119,8 @@
 //                     <div className="space-y-6">
 //                         <div className="flex justify-between items-center">
 //                             <h1 className="text-2xl font-bold text-white">My Projects</h1>
-//                             <CreateNewProjectModal />
+//                             {/* Only show the button if there are no projects */}
+//                             {projects.length === 0 && <CreateNewProjectModal />}
 //                         </div>
 
 //                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -144,14 +145,20 @@
 //                     </div>
 //                 )}
 //             </div>
+
+//             {/* Note about project creation limit at the bottom */}
+//             <div className="fixed bottom-0 left-0 pl-40  ml-40 right-0 p-4 bg-gray-800 border-t border-gray-700">
+//                 <Card className="bg-gray-700  ">
+//                     <CardContent>
+//                         <p className="text-gray-300 text-center pt-6">
+//                             Note: Currently, we only support one project creation per user.
+//                         </p>
+//                     </CardContent>
+//                 </Card>
+//             </div>
 //         </div>
 //     );
 // }
-
-
-
-
-
 
 "use client";
 
@@ -199,7 +206,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
 };
 
 export default function DashboardPage() {
-    const { user } = useUser();
+    const { user, isLoaded } = useUser();
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -208,6 +215,12 @@ export default function DashboardPage() {
 
     useEffect(() => {
         async function fetchProjects() {
+            // Wait for user to be loaded
+            if (!isLoaded) {
+                return;
+            }
+
+            // Redirect if no user
             if (!user) {
                 router.push('/');
                 setLoading(false);
@@ -216,36 +229,62 @@ export default function DashboardPage() {
 
             try {
                 const response = await fetch(`/api/projects/${user.id}`);
+
+                // Specifically handle 404 as a new user scenario
+                if (response.status === 404) {
+                    setIsNewUser(true);
+                    setProjects([]);
+                    setLoading(false);
+                    return;
+                }
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+
                 const data = await response.json();
                 console.log("API Response:", data);
 
                 // Handle different response formats
                 if (Array.isArray(data)) {
                     setProjects(data);
+                    setIsNewUser(data.length === 0);
                 } else if (data && typeof data === 'object' && data._id) {
                     // If it's a single project object, wrap it in an array
                     setProjects([data]);
+                    setIsNewUser(false);
                 } else if (data && data.projects && Array.isArray(data.projects)) {
                     setProjects(data.projects);
+                    setIsNewUser(data.projects.length === 0);
                 } else {
                     console.warn("Unexpected data format:", data);
                     setProjects([]);
+                    setIsNewUser(true);
                 }
 
-                setIsNewUser(false);
                 setLoading(false);
             } catch (err) {
                 console.error('Error fetching projects:', err);
                 setError(err instanceof Error ? err.message : 'An unknown error occurred');
+
+                // Set to new user if there's an error fetching projects
+                setIsNewUser(true);
+                setProjects([]);
                 setLoading(false);
             }
         }
 
         fetchProjects();
-    }, [user, router]);
+    }, [user, isLoaded, router]);
+
+    // Wait for user to be loaded
+    if (!isLoaded) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <p className="text-white">Loading...</p>
+            </div>
+        );
+    }
 
     if (loading) {
         return (
