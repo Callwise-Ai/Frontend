@@ -169,6 +169,7 @@ import { Button } from "@/components/ui/button";
 import { CreateNewProjectModal } from "@/components/CreateNewProjectModal";
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { Copy, CheckCircle } from 'lucide-react';
 
 type Project = {
     _id: string;
@@ -180,25 +181,87 @@ type Project = {
     api_key?: string;
 };
 
-// ProjectCard Component
+// // ProjectCard Component
+// const ProjectCard = ({ project }: { project: Project }) => {
+//     const router = useRouter();
+
+//     const handleProjectClick = () => {
+//         // router.push(`/project/${project._id}`);
+//     };
+
+//     return (
+//         <Card className="bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer" onClick={handleProjectClick}>
+//             <CardHeader>
+//                 <CardTitle className="text-white">{project.name || 'Untitled Project'}</CardTitle>
+//             </CardHeader>
+//             <CardContent>
+//                 <div className="space-y-2">
+//                     <p className="text-gray-400 text-sm">Model: {project.selected_model}</p>
+//                     <p className="text-gray-400 text-sm truncate">
+//                         Context: {project.context || 'No context provided'}
+//                     </p>
+//                 </div>
+//             </CardContent>
+//         </Card>
+//     );
+// };
+
+
 const ProjectCard = ({ project }: { project: Project }) => {
     const router = useRouter();
+    const [isCopied, setIsCopied] = useState(false);
 
     const handleProjectClick = () => {
         // router.push(`/project/${project._id}`);
     };
 
+    const handleCopyUserId = async () => {
+        try {
+            await navigator.clipboard.writeText(project.user_id);
+            setIsCopied(true);
+            toast.success('User ID copied to clipboard');
+
+            // Reset the copied state after 2 seconds
+            setTimeout(() => {
+                setIsCopied(false);
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            toast.error('Failed to copy User ID');
+        }
+    };
+
     return (
-        <Card className="bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer" onClick={handleProjectClick}>
+        <Card className="bg-gray-800 hover:bg-gray-700 transition-colors cursor-pointer relative group" onClick={handleProjectClick}>
             <CardHeader>
-                <CardTitle className="text-white">{project.name || 'Untitled Project'}</CardTitle>
+                <CardTitle className="text-white">Model: {project.selected_model}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="space-y-2">
-                    <p className="text-gray-400 text-sm">Model: {project.selected_model}</p>
-                    <p className="text-gray-400 text-sm truncate">
+                    {/* <p className="text-gray-400 text-sm">Model: {project.selected_model}</p> */}
+                    {/* <p className="text-gray-400 text-sm truncate">
                         Context: {project.context || 'No context provided'}
-                    </p>
+                    </p> */}
+
+                    {/* User ID Display with Copy Option */}
+                    <div className="flex items-center justify-between mt-2 bg-gray-700 rounded-md p-2">
+                        <span className="text-xs text-gray-300 truncate mr-2">
+                            API key: {project.user_id}
+                        </span>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent triggering card click
+                                handleCopyUserId();
+                            }}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            {isCopied ? (
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : (
+                                <Copy className="h-4 w-4" />
+                            )}
+                        </button>
+                    </div>
                 </div>
             </CardContent>
         </Card>
