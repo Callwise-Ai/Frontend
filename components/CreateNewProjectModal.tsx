@@ -73,7 +73,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('//64.227.138.80:5000/set_api_key', {
+            const response = await fetch('//64.227.138.80/set_api_key', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
