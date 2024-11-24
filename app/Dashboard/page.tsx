@@ -165,7 +165,6 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { CreateNewProjectModal } from "@/components/CreateNewProjectModal";
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -208,7 +207,7 @@ type Project = {
 
 
 const ProjectCard = ({ project }: { project: Project }) => {
-    const router = useRouter();
+    // const router = useRouter();
     const [isCopied, setIsCopied] = useState(false);
 
     const handleProjectClick = () => {

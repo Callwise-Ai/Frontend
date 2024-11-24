@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {
     LayoutDashboard,
-    PlusCircle,
     Phone,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
