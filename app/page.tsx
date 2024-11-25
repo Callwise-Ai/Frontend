@@ -88,7 +88,7 @@ if __name__ == "__main__":
               <Button
                 variant="outline"
                 className="bg-white/10 text-white hover:bg-white/20 flex items-center gap-2"
-                onClick={() => window.open('http://localhost:3000/documentation', '_blank')}
+                onClick={() => window.open('http://206.189.138.143:3000/documentation', '_blank')}
               >
                 <BookMarked className="w-5 h-5" />
                 Documentation
