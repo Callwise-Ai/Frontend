@@ -212,6 +212,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
             });
         } finally {
             setIsLoading(false);
+            window.location.reload();
         }
     };
 
