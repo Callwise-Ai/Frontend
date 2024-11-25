@@ -24,7 +24,7 @@ import requests
 
 # Make sure to set your CALLWISE_API environment variable in your environment
 
-RAG_QUERY_URL = 'http://64.227.138.80:5000/rag_query'
+RAG_QUERY_URL = 'http://206.189.138.143:5000/rag_query'
 
 def send_transcript_to_rag_query(final_transcript):
     try:
