@@ -73,7 +73,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://206.189.129.34:5000/set_api_key', {
+            const response = await fetch('http://206.189.138.143/set_api_key', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('//206.189.129.34:5000/set_model', {
+            const response = await fetch('//206.189.138.143/set_model', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                 fileContent: parsedText
             }));
 
-            const contextResponse = await fetch('//206.189.129.34:5000/set_context', {
+            const contextResponse = await fetch('//206.189.138.143/set_context', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -221,7 +221,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                 return (
                     <div className="space-y-4">
                         <div>
-                            <Label htmlFor="apiKey">API Key</Label>
+                            <Label htmlFor="apiKey">SambaNova API Key</Label>
                             <Input
                                 id="apiKey"
                                 type="password"
