@@ -73,7 +73,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('http://206.189.138.143/set_api_key', {
+            const response = await fetch('http://206.189.138.143:5000/set_api_key', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
 
         setIsLoading(true);
         try {
-            const response = await fetch('//206.189.138.143/set_model', {
+            const response = await fetch('//206.189.138.143:5000/set_model', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ export function CreateNewProjectModal({ isNewUser = false }) {
                 fileContent: parsedText
             }));
 
-            const contextResponse = await fetch('//206.189.138.143/set_context', {
+            const contextResponse = await fetch('//206.189.138.143:5000/set_context', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
