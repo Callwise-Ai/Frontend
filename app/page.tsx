@@ -1,7 +1,7 @@
 "use client"
 import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { Button } from "@/components/ui/button";
-import { Github, Copy } from "lucide-react";
+import { BookMarked, Copy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -88,10 +88,10 @@ if __name__ == "__main__":
               <Button
                 variant="outline"
                 className="bg-white/10 text-white hover:bg-white/20 flex items-center gap-2"
-                onClick={() => window.open('https://github.com/Architgarg2003/Echo', '_blank')}
+                onClick={() => window.open('http://localhost:3000/documentation', '_blank')}
               >
-                <Github className="w-5 h-5" />
-                GitHub
+                <BookMarked className="w-5 h-5" />
+                Documentation
               </Button>
 
               {/* Clerk Authentication */}
